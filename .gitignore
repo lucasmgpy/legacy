@@ -1,3 +1,4 @@
 bin/
 obj/
 *.log
+MeuProjeto/appsettings*.json

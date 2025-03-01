@@ -124,3 +124,57 @@
    - Cria um commit com a mensagem.
 3. `git push origin main`
    - Envia para o GitHub.
+## Fase 4: Adicionar Teste Unitário (Revisada)
+
+### Passo 1: Criar o Projeto de Testes
+**Comando:** `dotnet new xunit -o MeuProjeto.Tests`
+- **`xunit`**: Template para testes com xUnit.
+- **`-o MeuProjeto.Tests`**: Cria o projeto na pasta especificada.
+
+### Passo 2: Adicionar Referência ao Projeto Principal
+**Comando:** `dotnet add MeuProjeto.Tests reference MeuProjeto`
+- **`reference`**: Adiciona dependência do projeto MVC.
+- **Nota**: Execute na raiz (`legacy`).
+
+### Passo 3: Escrever um Teste Unitário
+**Comando:** `(cat substitui UnitTest1.cs)`
+- Testa se `HomeController.Index` retorna `ViewResult`.
+
+### Passo 4: Executar os Testes
+**Comando:** `dotnet test MeuProjeto.Tests`
+- **`test MeuProjeto.Tests`**: Executa o teste unitário no projeto especificado.
+
+### Passo 5: Adicionar ao Git
+**Comandos:**
+1. `git add .`
+2. `git commit -m "Adicionado teste unitário"`
+3. `git push origin main`
+
+### Nota de Revisão
+- Testes de integração foram removidos por simplicidade, mantendo apenas o teste unitário.
+- Arquivos `IntegrationTest1.cs` e `TestStartup.cs` excluídos, pacote `Microsoft.AspNetCore.Mvc.Testing` removido.
+
+## Fase 5: Criar Scripts Bash
+
+### Passo 1: Criar o Script `build.sh`
+**Comando:** `(cat cria build.sh)`
+- Compila o projeto com `dotnet build`.
+
+### Passo 2: Criar o Script `test.sh`
+**Comando:** `(cat cria test.sh)`
+- Executa testes unitários com `dotnet test` (testes de integração removidos por erros).
+
+### Passo 3: Criar o Script `deploy.sh`
+**Comando:** `(cat cria deploy.sh)`
+- Simula deploy com `dotnet publish`.
+
+### Passo 4: Tornar os Scripts Executáveis
+**Comando:** `chmod +x *.sh`
+- **`chmod +x`**: Dá permissão de execução.
+- **`*.sh`**: Aplica a todos os scripts `.sh`.
+
+### Passo 5: Adicionar ao Git
+**Comandos:**
+1. `git add .`
+2. `git commit -m "Adicionados scripts bash para build, test e deploy"`
+3. `git push origin main`
