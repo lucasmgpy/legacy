@@ -25,4 +25,4 @@ jobs:
         run: |
           az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
           cd MeuProjeto && dotnet publish -c Release -o publish && zip -r ../publish.zip publish
-          az webapp deployment source config-zip --resource-group legacy-rg --name legacy-app --src publish.zip
+          az webapp deployment source config-zip --resource-group legacylmg-rg --name legacyactions-app --src publish.zip
