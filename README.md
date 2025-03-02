@@ -209,3 +209,19 @@
 3. `git add .`
 4. `git commit -m "Adicionada infra Terraform para Azure"`
 5. `git push origin main`
+### Nota: Correção Final de Arquivos Grandes na Fase 6
+- **Problema:** Arquivo `infra/.terraform/.../terraform-provider-azurerm_v3.117.1_x5` (222.83 MB) no commit `abf5e8d`.
+- **Solução:**
+  1. Durante `git rebase -i` em `abf5e8d` (HEAD `66eb5a6`):
+     - Adicionada linha em branco em `infra/main.tf` para rastreamento.
+     - `git rm -r --cached infra/.terraform`
+     - `git add infra/main.tf`
+     - `git commit --amend`
+  2. `git rebase --continue`
+  3. Pós-rebase:
+     - `git reset --soft HEAD^`
+     - `git rm -r --cached infra/.terraform.lock.hcl`
+     - `git commit -m "Adiciona infra Terraform para Azure (sem .terraform nem .lock)"`
+  4. `git push origin main --force`
+  5. `cd infra && terraform init`
+- **Nota:** `infra/.terraform.lock.hcl` permanece em `66eb5a6`, mas é removido em `714561f`. Limpeza adicional pode ser feita posteriormente.
