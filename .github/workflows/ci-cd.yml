@@ -23,6 +23,12 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
+          echo "Current working directory: $PWD"
+          cd MeuProjeto
+          echo "Now in directory: $PWD"
+          dotnet publish -c Release -o publish
+          ls -la publish
+          zip -r publish.zip publish
+          ls -la
           az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-          cd MeuProjeto && dotnet publish -c Release -o publish && zip -r ../publish.zip publish
           az webapp deployment source config-zip --resource-group legacylmg-rg --name legacylmg-app --src publish.zip
