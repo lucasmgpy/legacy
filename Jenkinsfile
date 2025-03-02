@@ -16,6 +16,12 @@ pipeline {
                 sh './test.sh'
             }
         }
+        stage('Install Azure CLI') {
+            steps {
+                sh 'apt-get update && apt-get install -y curl'
+                sh 'curl -sL https://aka.ms/InstallAzureCLIDeb | bash'
+            }
+        }
         stage('Deploy to Azure') {
             steps {
                 sh 'apt-get update && apt-get install -y curl'
