@@ -178,3 +178,34 @@
 1. `git add .`
 2. `git commit -m "Adicionados scripts bash para build, test e deploy"`
 3. `git push origin main`
+
+## Fase 6: Configurar Terraform para Infraestrutura no Azure
+
+### Passo 1: Criar uma Pasta para o Terraform
+**Comando:** `mkdir infra`
+- Cria a pasta `infra` para arquivos Terraform.
+
+### Passo 2: Criar o Arquivo `main.tf`
+**Comando:** `(cat cria main.tf)`
+- Define um Resource Group, App Service Plan e App Service no Azure.
+
+### Passo 3: Autenticar no Azure
+**Comando:** `az login`
+- Autentica no Azure via navegador.
+
+### Passo 4: Inicializar o Terraform
+**Comando:** `terraform init`
+- Baixa provedores e inicializa o Terraform.
+
+### Passo 5: Aplicar a Infraestrutura
+**Comando:** `terraform apply`
+- Cria os recursos no Azure (digite `yes` para confirmar).
+
+### Passo 6: Adicionar ao Git
+**Comandos:**
+1. `cd ..`
+2. `echo "infra/terraform.tfstate" >> .gitignore`
+   - Ignora o arquivo de estado.
+3. `git add .`
+4. `git commit -m "Adicionada infra Terraform para Azure"`
+5. `git push origin main`

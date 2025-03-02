@@ -3,3 +3,4 @@ obj/
 *.log
 MeuProjeto/appsettings*.json
 infra/terraform.tfstate
+infra/.terraform/
