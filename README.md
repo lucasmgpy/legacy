@@ -246,3 +246,29 @@
      - `git add Jenkinsfile`
      - `git commit -m "Adicionada pipeline Jenkins com Docker para ambiente isolado"`
      - `git push origin main`
+     
+## Fase 8: Migrar para GitHub Actions com Self-Hosted Runner
+- **Objetivo:** Migrar a pipeline CI/CD do Jenkins para GitHub Actions, utilizando um self-hosted runner configurado na máquina Ubuntu 22.04, para replicar o ambiente do projeto legado.
+- **Passos:**
+  1. **Configurado self-hosted runner no Ubuntu 22.04:**
+     - Criado diretório para o runner: `mkdir actions-runner && cd actions-runner`.
+     - Baixado o pacote do runner: `curl -o actions-runner-linux-x64-2.317.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz`.
+     - Extraiu o pacote: `tar xzf actions-runner-linux-x64-2.317.0.tar.gz`.
+     - Configurado o runner no GitHub: `./config.sh --url https://github.com/lucasmgpy/legacy --token <TOKEN>`, usando um token gerado em Settings > Actions > Runners no GitHub.
+     - Testado o runner: `./run.sh` e configurado como serviço para execução contínua: `sudo ./svc.sh install && sudo ./svc.sh start`.
+  2. **Criado workflow YAML para GitHub Actions:**
+     - Criado arquivo `.github/workflows/ci-cd.yml` com:
+       - `name: CI-CD Pipeline`: Nome do workflow.
+       - `on: push: branches: [ main ]`: Dispara no push para `main`.
+       - `jobs: build-test-deploy: runs-on: self-hosted`: Job único rodando no self-hosted runner.
+       - `steps:` com checkout (`actions/checkout@v3`), build (`./build.sh`), test (`./test.sh`), instalação da Azure CLI e zip, e deploy no Azure:
+         - `sudo apt-get update && sudo apt-get install -y curl zip && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`.
+         - `az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID`.
+         - `cd MeuProjeto && dotnet publish -c Release -o publish && zip -r publish.zip publish && az webapp deployment source config-zip --resource-group legacy-rg --name legacy-app --src publish.zip`.
+  3. **Configurados segredos no GitHub:**
+     - Adicionados `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, e `AZURE_TENANT_ID` em Settings > Secrets and variables > Actions > Secrets, usando valores obtidos do Azure (via `az ad sp create-for-rbac`).
+  4. **Adicionado ao Git:**
+     - `git add .github/workflows/ci-cd.yml`
+     - `git commit -m "Migrada pipeline para GitHub Actions com self-hosted runner"`
+     - `git push origin main`
+- **Resultados:** A pipeline CI/CD foi migrada com sucesso, executando build, test e deploy no Azure via GitHub Actions em um self-hosted runner, replicando a funcionalidade do Jenkins e atendendo aos requisitos do projeto legado.
