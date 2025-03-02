@@ -225,3 +225,24 @@
   4. `git push origin main --force`
   5. `cd infra && terraform init`
 - **Nota:** `infra/.terraform.lock.hcl` permanece em `66eb5a6`, mas é removido em `714561f`. Limpeza adicional pode ser feita posteriormente.
+
+## Fase 7: Configurar Pipeline Jenkins CI/CD com Docker na Pipeline
+- **Objetivo:** Criar uma pipeline Jenkins que compile, teste e faça deploy do projeto MVC no Azure, rodando em contêineres Docker para ambiente isolado.
+- **Passos:**
+  1. Configurado Jenkins para usar Docker:
+     - Plugin "Docker Pipeline" instalado via interface em http://localhost:8080.
+     - Permissões ajustadas: `sudo usermod -aG docker jenkins && sudo systemctl restart jenkins`.
+  2. Criado `Jenkinsfile` com pipeline em contêiner .NET SDK 8.0:
+     - Estágios: "Build", "Test", "Setup Environment" (instala Azure CLI e zip), "Deploy to Azure".
+     - Credenciais Azure vinculadas com `environment` e `credentials()`.
+     - Deploy via ZIP com `az webapp deployment source config-zip`.
+  3. Configuradas credenciais Azure no Jenkins:
+     - Adicionados `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` em "Manage Credentials".
+  4. Pipeline criada em http://localhost:8080:
+     - Tipo: "Pipeline script from SCM".
+     - URL: `git@github.com:lucasmgpy/legacy.git`.
+     - Script Path: `Jenkinsfile`.
+  5. Arquivos adicionados ao Git:
+     - `git add Jenkinsfile`
+     - `git commit -m "Adicionada pipeline Jenkins com Docker para ambiente isolado"`
+     - `git push origin main`
