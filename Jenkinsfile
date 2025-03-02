@@ -16,9 +16,9 @@ pipeline {
                 sh './test.sh'
             }
         }
-        stage('Install Azure CLI') {
+        stage('setup environment') {
             steps {
-                sh 'apt-get update && apt-get install -y curl'
+                sh 'apt-get update && apt-get install -y curl zip'
                 sh 'curl -sL https://aka.ms/InstallAzureCLIDeb | bash'
             }
         }
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
                 sh 'cd MeuProjeto && dotnet publish -c Release -o publish && zip -r ../publish.zip publish'
-                sh 'az webapp deployment source config-zip --resource-group legacy-rg --name legacy-app --src publish.zip'
+                sh 'az webapp deployment source config-zip --resource-group legacylmg-rg --name legacylmg-app --src publish.zip'
             }
         }
     }
