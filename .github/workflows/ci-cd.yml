@@ -19,24 +19,18 @@ jobs:
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
           sudo systemctl start docker
           sudo usermod -aG docker $USER
-      - name: Build Docker Image
+      - name: Build and Push Docker Image
         run: |
           cd MeuProjeto
-          docker build -t legacylmg-app:latest .
-      - name: Save and Deploy Docker Image
+          docker build -t lucasmgpy/legacylmg-app:latest .
+          docker push lucasmgpy/legacylmg-app:latest
+      - name: Deploy to Azure
         if: github.ref == 'refs/heads/main'
         env:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          echo "Current working directory: $PWD"
-          cd MeuProjeto
-          echo "Now in directory: $PWD"
-          ls -la  # Debug: listar arquivos para verificar se Dockerfile existe
-          docker save legacylmg-app:latest | gzip > legacylmg-app.tar.gz
-          echo "Saved Docker image as legacylmg-app.tar.gz, size: $(ls -lh legacylmg-app.tar.gz | awk '{print $5}')"
           az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-          az webapp deployment source config-zip --resource-group legacylmg-rg --name legacylmg-app --src legacylmg-app.tar.gz
-          az webapp config container set --name legacylmg-app --resource-group legacylmg-rg --container-image-name legacylmg-app:latest --container-registry-url https://index.docker.io
+          az webapp config container set --name legacylmg-app --resource-group legacylmg-rg --container-image-name lucasmgpy/legacylmg-app:latest --container-registry-url https://index.docker.io
           az webapp restart --name legacylmg-app --resource-group legacylmg-rg
