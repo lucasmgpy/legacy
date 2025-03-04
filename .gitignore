@@ -1,6 +1,12 @@
 bin/
 obj/
 *.log
+# Ignorar o diretório do self-hosted runner
+actions-runner/
+
 MeuProjeto/appsettings*.json
+
+# Ignorar arquivos ferados pelo Terraform
+infra/.terraform.lock.hcl
 infra/terraform.tfstate
 infra/.terraform/
