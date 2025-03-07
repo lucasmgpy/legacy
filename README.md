@@ -1,43 +1,10 @@
-#### Visão Geral
-O projeto "legacy" é uma aplicação web ASP.NET Core MVC com autenticação individual, usando SQLite para banco de dados, containerizada com Docker, e deployada no Azure App Service. Foi criado para simular um projeto legado, praticando CI/CD, automação, e manutenção, com foco em aprendizado de práticas DevOps.
-
-#### Tecnologia Stack
-- **Linguagens e Frameworks:** C#, ASP.NET Core MVC, Entity Framework Core.
-- **Banco de Dados:** SQLite, com arquivo `app.db`.
-- **Containerização:** Docker, com imagem `lucasmgpy/legacylmg-app:latest` no Docker Hub.
-- **CI/CD:** GitHub Actions, com self-hosted runner em Ubuntu 22.04.
-- **Cloud:** Azure App Service, usando um resource group e App Service configurados.
-- **Infraestrutura:** Terraform para provisionar recursos no Azure.
-
-#### Estrutura do Projeto
-- **Diretórios e Arquivos Principais:**
-  - `MeuProjeto/`: Contém o código ASP.NET Core (`.csproj`, `Program.cs`, `app.db`, `wwwroot`, etc.).
-  - `infra/`: Arquivo `main.tf` para Terraform, configurando recursos no Azure.
-  - `.github/workflows/ci-cd.yml`: Workflow para CI/CD, build, test, e deploy.
-  - Scripts Bash: `build.sh`, `test.sh`, `deploy.sh` na raiz para automação.
-
-#### Processos de Build e Deploy
-- **Build:** Usa `dotnet build` via `build.sh`, executado no self-hosted runner.
-- **Teste:** Roda testes unitários com `dotnet test` via `test.sh`.
-- **Containerização:** Cria imagem Docker com `docker build -t lucasmgpy/legacylmg-app:latest .`, publicada no Docker Hub.
-- **Deploy:** Configura no Azure App Service com `az webapp config container set`, usando string de conexão `DefaultConnection="Data Source=/app/app.db"`.
-
-#### Troubleshooting
-- Erros comuns: Falhas de pull de imagem Docker, strings de conexão ausentes, e timeouts no deploy.
-- Solução: Ativar logs com `az webapp log config --application-logging filesystem --level information`, verificar com `az webapp log tail`.
-
-#### Monitoramento e Manutenção
-- Use Azure Monitor para métricas (ex.: HTTP 5xx) com `az monitor metrics list`.
-- Scripts Bash como `monitor-app.sh` para verificar status: `az webapp show`.
-
----
-
 ### Documentação Completa do Projeto "Legacy"
 
 #### Introdução
 O projeto "legacy" é um microprojeto desenvolvido para simular um sistema legado, com o objetivo de praticar habilidades DevOps, incluindo CI/CD, containerização, automação, e deploy em cloud. Ele consiste em uma aplicação web ASP.NET Core MVC com autenticação individual, usando SQLite, containerizada com Docker, e deployada no Azure App Service via GitHub Actions com self-hosted runner.
 
 #### Objetivos
+- Migração de pipeline em jenkins para github actions, utilizando um runner self-hosted.
 - Simular um projeto legado para aprender automação CI/CD, manutenção de scripts Bash, e integração com Azure.
 - Desenvolver habilidades em troubleshooting, automação, e deploy em cloud.
 - Garantir compatibilidade e eficiência em deploys, focando em boas práticas DevOps.
@@ -149,7 +116,7 @@ Durante o desenvolvimento, enfrentamos os seguintes problemas comuns e suas solu
 | Conflito de dependências no Docker    | `containerd.io` conflitando com `containerd` | Remover `containerd.io` e reinstalar `docker.io` com `sudo apt-get install --reinstall docker.io` |
 
 #### Monitoramento e Manutenção
-Para manter o projeto "legacy" em produção, siga estas práticas:
+Para manter o projeto "legacy" em produção, devo seguir estas práticas:
 
 - **Monitoramento com Azure Monitor:**
   - Verifique métricas com:
@@ -169,7 +136,7 @@ Para manter o projeto "legacy" em produção, siga estas práticas:
     az webapp show --name legacylmg-app --resource-group legacylmg-rg --query "state" -o tsv | grep -q "Running" || { echo "Site não está rodando"; exit 1; }
     echo "Site legacylmg-app está rodando."
     ```
-  - Teste com:
+  - Testar com:
     ```bash
     chmod +x ~/legacy/MeuProjeto/monitor-app.sh
     ~/legacy/MeuProjeto/monitor-app.sh
@@ -191,7 +158,6 @@ Para manter o projeto "legacy" em produção, siga estas práticas:
     ```
 
 #### Contribuições e Próximos Passos
-- Este documento substitui o README.md para fornecer uma documentação completa e estruturada.
 - Para contribuir, faça forks no GitHub, crie branches (`git checkout -b feature/nova-funcionalidade`), e envie pull requests.
 - Próximos passos: Explorar monitoramento avançado com Prometheus/Grafana, segurança em CI/CD, ou integração com Kubernetes para escalabilidade.
 
@@ -203,3 +169,4 @@ Para manter o projeto "legacy" em produção, siga estas práticas:
 - [Docker Hub Official Documentation](https://docs.docker.com/docker-hub/)
 - [Azure Monitor Metrics CLI Reference](https://learn.microsoft.com/en-us/cli/azure/monitor/metrics?view=azure-cli-latest)
 - [Terraform Azure Provider Documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
+
