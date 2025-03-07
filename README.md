@@ -1,274 +1,205 @@
-#Legacy Project
-## Fase 1: Configuração Inicial do Ambiente
+#### Visão Geral
+O projeto "legacy" é uma aplicação web ASP.NET Core MVC com autenticação individual, usando SQLite para banco de dados, containerizada com Docker, e deployada no Azure App Service. Foi criado para simular um projeto legado, praticando CI/CD, automação, e manutenção, com foco em aprendizado de práticas DevOps.
 
-### Passo 1: Atualizar o Sistema
-**Comando:** `sudo apt update && sudo apt upgrade -y`
-- **`sudo`**: Executa como administrador.
-- **`apt update`**: Atualiza a lista de pacotes disponíveis.
-- **`&&`**: Executa o próximo comando se o anterior for bem-sucedido.
-- **`apt upgrade -y`**: Atualiza os pacotes instalados, com `-y` para confirmar automaticamente.
+#### Tecnologia Stack
+- **Linguagens e Frameworks:** C#, ASP.NET Core MVC, Entity Framework Core.
+- **Banco de Dados:** SQLite, com arquivo `app.db`.
+- **Containerização:** Docker, com imagem `lucasmgpy/legacylmg-app:latest` no Docker Hub.
+- **CI/CD:** GitHub Actions, com self-hosted runner em Ubuntu 22.04.
+- **Cloud:** Azure App Service, usando um resource group e App Service configurados.
+- **Infraestrutura:** Terraform para provisionar recursos no Azure.
 
-### Passo 2: Instalar Git
-**Comando:** `sudo apt install git -y`
-- **`sudo apt install`**: Instala um pacote.
-- **`git`**: Pacote do Git, sistema de controle de versão.
-- **`-y`**: Confirma automaticamente.
+#### Estrutura do Projeto
+- **Diretórios e Arquivos Principais:**
+  - `MeuProjeto/`: Contém o código ASP.NET Core (`.csproj`, `Program.cs`, `app.db`, `wwwroot`, etc.).
+  - `infra/`: Arquivo `main.tf` para Terraform, configurando recursos no Azure.
+  - `.github/workflows/ci-cd.yml`: Workflow para CI/CD, build, test, e deploy.
+  - Scripts Bash: `build.sh`, `test.sh`, `deploy.sh` na raiz para automação.
 
-### Passo 3: Configurar Git
-**Comandos:**
-1. `git config --global user.name "SeuNome"`
-   - **`--global`**: Aplica a configuração a todos os repositórios.
-   - **`user.name`**: Define o nome para commits.
-2. `git config --global user.email "seuemail@exemplo.com"`
-   - **`user.email`**: Define o e-mail para commits.
+#### Processos de Build e Deploy
+- **Build:** Usa `dotnet build` via `build.sh`, executado no self-hosted runner.
+- **Teste:** Roda testes unitários com `dotnet test` via `test.sh`.
+- **Containerização:** Cria imagem Docker com `docker build -t lucasmgpy/legacylmg-app:latest .`, publicada no Docker Hub.
+- **Deploy:** Configura no Azure App Service com `az webapp config container set`, usando string de conexão `DefaultConnection="Data Source=/app/app.db"`.
 
-### Passo 4: Instalar Jenkins
-**Comando 1:** `sudo apt install openjdk-17-jre -y`
-- **`openjdk-17-jre`**: Instala Java 17, necessário para o Jenkins.
+#### Troubleshooting
+- Erros comuns: Falhas de pull de imagem Docker, strings de conexão ausentes, e timeouts no deploy.
+- Solução: Ativar logs com `az webapp log config --application-logging filesystem --level information`, verificar com `az webapp log tail`.
 
-**Comandos 2 a 5:**
-1. `sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian/jenkins.io-2023.key`
-   - **`wget`**: Baixa a chave do repositório Jenkins.
-   - **`-O`**: Define o destino do arquivo.
-2. `echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null`
-   - Adiciona o repositório Jenkins às fontes do sistema.
-3. `sudo apt update`
-   - Atualiza a lista de pacotes com o repositório Jenkins.
-4. `sudo apt install jenkins -y`
-   - Instala o Jenkins.
+#### Monitoramento e Manutenção
+- Use Azure Monitor para métricas (ex.: HTTP 5xx) com `az monitor metrics list`.
+- Scripts Bash como `monitor-app.sh` para verificar status: `az webapp show`.
 
-### Passo 5: Instalar Azure CLI
-**Comandos:**
-1. `curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`
-   - **`curl`**: Baixa o script de instalação.
-   - **`bash`**: Executa o script.
-2. `az login`
-   - Autentica no Azure.
+---
 
-### Passo 6: Criar Chave SSH
-**Comando:** `ssh-keygen -t ed25519 -C "seuemail@exemplo.com"`
-- **`ssh-keygen`**: Gera chaves SSH.
-- **`-t ed25519`**: Tipo de chave.
-- **`-C`**: Comentário (e-mail).
+### Documentação Completa do Projeto "Legacy"
 
-### Passo 7: Adicionar Chave ao GitHub
-- Copie a chave pública (`cat ~/.ssh/id_ed25519.pub`) e adicione manualmente no GitHub.
+#### Introdução
+O projeto "legacy" é um microprojeto desenvolvido para simular um sistema legado, com o objetivo de praticar habilidades DevOps, incluindo CI/CD, containerização, automação, e deploy em cloud. Ele consiste em uma aplicação web ASP.NET Core MVC com autenticação individual, usando SQLite, containerizada com Docker, e deployada no Azure App Service via GitHub Actions com self-hosted runner.
 
-## Fase 2: Criar Repositório GitHub do Zero
+#### Objetivos
+- Simular um projeto legado para aprender automação CI/CD, manutenção de scripts Bash, e integração com Azure.
+- Desenvolver habilidades em troubleshooting, automação, e deploy em cloud.
+- Garantir compatibilidade e eficiência em deploys, focando em boas práticas DevOps.
 
-### Passo 1: Criar o Repositório no GitHub (Interface Web)
-- Acesse github.com, faça login, clique em "+" > "New repository".
-- **Nome**: `legacy`
-- **Descrição**: "Microprojeto para prática de DevOps: Jenkins, GitHub Actions e Terraform."
-- Configure como público e deixe sem arquivos iniciais.
+#### Tecnologia Stack
+Abaixo está a lista de tecnologias utilizadas, com suas funções no projeto:
 
-### Passo 2: Clonar o Repositório Localmente
-**Comando:** `git clone git@github.com:seuusuario/legacy.git`
-- **`git clone`**: Cria uma cópia local do repositório remoto.
-- **`git@github.com:seuusuario/legacy.git`**: Endereço SSH do repositório (substitua `seuusuario`).
+| Tecnologia                | Função                                                                 |
+|---------------------------|------------------------------------------------------------------------|
+| ASP.NET Core MVC          | Framework para a aplicação web, com controllers, views, e autenticação |
+| Entity Framework Core     | ORM para gerenciar o banco de dados SQLite                            |
+| SQLite                    | Banco de dados leve, usando arquivo `app.db` para persistência         |
+| Docker                    | Containerização da aplicação, criando imagem `lucasmgpy/legacylmg-app:latest` |
+| GitHub Actions            | Plataforma CI/CD para automação de build, teste, e deploy             |
+| Self-Hosted Runner        | Runner personalizado em Ubuntu 22.04 para executar workflows          |
+| Azure App Service         | Hospedagem da aplicação containerizada, usando um resource group      |
+| Terraform                 | Provisionamento de infraestrutura no Azure                            |
+| Azure CLI                 | Gerenciamento de recursos Azure via CLI, como logs e configurações    |
+| Bash Scripts              | Automação de tarefas (build, teste, deploy) com `build.sh`, `test.sh` |
 
-### Passo 3: Criar o Arquivo `.gitignore`
-**Comando:** `echo -e "bin/\nobj/\n*.log" > .gitignore`
-- **`echo -e`**: Interpreta `\n` como nova linha.
-- **`bin/`, `obj/`, `*.log`**: Ignora pastas de compilação e logs.
-- **`>`**: Cria/sobrescreve o `.gitignore`.
+#### Estrutura do Projeto
+A estrutura do repositório `legacy` é organizada da seguinte forma, com detalhes de cada componente:
 
-### Passo 4: Criar o Arquivo `README.md` Inicial
-**Comando:** `echo "# Legacy Project" > README.md`
-- **`echo`**: Escreve texto.
-- **`"# Legacy Project"`**: Título em markdown.
-- **`>`**: Cria o `README.md`.
+- **Raiz do Repositório (`~/legacy/`):**
+  - `build.sh`: Script Bash para buildar o projeto com `dotnet build`.
+  - `test.sh`: Script Bash para rodar testes unitários com `dotnet test`.
+  - `deploy.sh`: Script Bash para simular deploy, usado no workflow.
+  - `.github/workflows/ci-cd.yml`: Workflow YAML para CI/CD, disparado em `push` para `dev` e `main`.
+  - `.gitignore`: Ignora arquivos como `actions-runner/` e `infra/.terraform.lock.hcl`.
 
-### Passo 5: Adicionar Conteúdo ao `README.md` com a Fase 1
-- (Já incluído anteriormente na Fase 1, com Java 17 ajustado.)
+- **Diretório `MeuProjeto/`:**
+  - `MeuProjeto.csproj`: Arquivo de projeto ASP.NET Core, definindo dependências e configurações.
+  - `Program.cs`: Código principal, configurando o app com `UseSqlite` e `DefaultConnection`.
+  - `app.db`: Arquivo SQLite para banco de dados, persistido no contêiner.
+  - `Controllers/`, `Views/`, `wwwroot/`: Estrutura MVC para controllers, views, e assets web.
+  - `Dockerfile`: Define a imagem Docker com multi-stage build, expondo porta 8080.
 
-### Passo 6: Adicionar, Commitar e Enviar Alterações
-**Comandos:**
-1. `git add .`
-   - Adiciona todos os arquivos alterados ao staging.
-2. `git commit -m "Configuração inicial do repositório com .gitignore e README"`
-   - **`commit`**: Salva as alterações localmente.
-   - **`-m`**: Define a mensagem do commit.
-3. `git push origin main`
-   - **`push`**: Envia para o repositório remoto.
-   - **`origin main`**: Remoto e branch principal.
+- **Diretório `infra/`:**
+  - `main.tf`: Arquivo Terraform para provisionar resources no Azure, como resource group e App Service.
 
-## Fase 3: Criar Microprojeto MVC com Individual Accounts
+#### Processos de Build e Deploy
+O processo de build, teste, e deploy é automatizado via GitHub Actions, com os seguintes passos:
 
-### Passo 1: Instalar o .NET SDK
-**Comando:** `sudo apt install -y dotnet-sdk-8.0`
-- **`sudo apt install`**: Instala pacotes no sistema.
-- **`-y`**: Confirma automaticamente.
-- **`dotnet-sdk-8.0`**: Instala o .NET SDK 8.0.
+1. **Build:**
+   - Executado pelo script `build.sh` no self-hosted runner:
+     ```bash
+     #!/bin/bash
+     echo "Iniciando build do projeto..."
+     dotnet build MeuProjeto/MeuProjeto.csproj
+     if [ $? -eq 0 ]; then echo "Build concluído com sucesso!"; else echo "Erro no build!" >&2; exit 1; fi
+     ```
+   - No workflow, chamado com:
+     ```yaml
+     - name: Build
+       run: ./build.sh
+     ```
 
-### Passo 2: Criar o Projeto MVC
-**Comando:** `dotnet new mvc --auth Individual -o MeuProjeto`
-- **`dotnet new`**: Cria um novo projeto.
-- **`mvc`**: Template MVC.
-- **`--auth Individual`**: Adiciona autenticação individual.
-- **`-o MeuProjeto`**: Define a pasta de saída.
+2. **Teste:**
+   - Executado pelo script `test.sh` no self-hosted runner:
+     ```bash
+     #!/bin/bash
+     echo "Executando testes..."
+     cd MeuProjeto.Tests
+     dotnet test
+     if [ $? -eq 0 ]; then echo "Testes concluídos com sucesso!"; else echo "Erro nos testes!" >&2; exit 1; fi
+     ```
+   - No workflow, chamado com:
+     ```yaml
+     - name: Test
+       run: ./test.sh
+     ```
 
-### Passo 3: Testar Localmente
-**Comando:** `dotnet run`
-- **`dotnet run`**: Compila e executa o projeto. Acesse `http://localhost:5000`.
+3. **Containerização e Deploy:**
+   - Cria a imagem Docker com:
+     ```yaml
+     - name: Build Docker Image
+       run: |
+         cd MeuProjeto
+         docker build -t lucasmgpy/legacylmg-app:latest .
+     ```
+   - Publica no Docker Hub e deploya no Azure App Service:
+     ```yaml
+     - name: Build and Push Docker Image
+       run: |
+         cd MeuProjeto
+         docker build -t lucasmgpy/legacylmg-app:latest .
+         docker push lucasmgpy/legacylmg-app:latest
+     - name: Deploy to Azure
+       if: github.ref == 'refs/heads/main'
+       env:
+         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+       run: |
+         az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+         az webapp config container set --name legacylmg-app --resource-group legacylmg-rg --container-image-name lucasmgpy/legacylmg-app:latest --container-registry-url https://index.docker.io --port 8080
+         az webapp restart --name legacylmg-app --resource-group legacylmg-rg
+     ```
 
-### Passo 4: Atualizar o `.gitignore`
-**Comando:** `echo "MeuProjeto/appsettings*.json" >> ../.gitignore`
-- Ignora arquivos de configuração sensíveis.
+#### Troubleshooting
+Durante o desenvolvimento, enfrentamos os seguintes problemas comuns e suas soluções:
 
-### Passo 5: Adicionar ao Git
-**Comandos:**
-1. `git add .`
-   - Adiciona todos os arquivos ao staging.
-2. `git commit -m "Projeto MVC inicial com autenticação individual"`
-   - Cria um commit com a mensagem.
-3. `git push origin main`
-   - Envia para o GitHub.
-## Fase 4: Adicionar Teste Unitário (Revisada)
+| Problema                              | Causa                                      | Solução                                                                 |
+|---------------------------------------|--------------------------------------------|-------------------------------------------------------------------------|
+| Falha no pull de imagem Docker        | Imagem não publicada no Docker Hub         | Publicar com `docker push lucasmgpy/legacylmg-app:latest`               |
+| Erro "Connection string not found"    | `DefaultConnection` ausente no Azure       | Configurar com `az webapp config appsettings set --settings DefaultConnection="Data Source=/app/app.db"` |
+| Timeout no deploy                     | Imagem grande ou problema de rede          | Usar `az webapp deploy` em vez de `az webapp deployment source config-zip` |
+| Falha no startup do contêiner         | Porta incorreta (8080 vs. 80)              | Ajustar `EXPOSE 8080` no `Dockerfile` e configurar no App Service com `--port 8080` |
+| Conflito de dependências no Docker    | `containerd.io` conflitando com `containerd` | Remover `containerd.io` e reinstalar `docker.io` com `sudo apt-get install --reinstall docker.io` |
 
-### Passo 1: Criar o Projeto de Testes
-**Comando:** `dotnet new xunit -o MeuProjeto.Tests`
-- **`xunit`**: Template para testes com xUnit.
-- **`-o MeuProjeto.Tests`**: Cria o projeto na pasta especificada.
+#### Monitoramento e Manutenção
+Para manter o projeto "legacy" em produção, siga estas práticas:
 
-### Passo 2: Adicionar Referência ao Projeto Principal
-**Comando:** `dotnet add MeuProjeto.Tests reference MeuProjeto`
-- **`reference`**: Adiciona dependência do projeto MVC.
-- **Nota**: Execute na raiz (`legacy`).
+- **Monitoramento com Azure Monitor:**
+  - Verifique métricas com:
+    ```bash
+    az monitor metrics list --resource <SUBSCRIPTION_ID>/resourceGroups/legacylmg-rg/providers/Microsoft.Web/sites/legacylmg-app --metric "Http5xx" --interval 5m
+    ```
+  - Configure alertas para erros HTTP 5xx:
+    ```bash
+    az monitor metrics alert create --name "HTTP-5xx-Alert" --resource-group legacylmg-rg --scopes <SUBSCRIPTION_ID>/resourceGroups/legacylmg-rg/providers/Microsoft.Web/sites/legacylmg-app --condition "avg Http5xx > 0" --action email <EMAIL_ADDRESS>
+    ```
 
-### Passo 3: Escrever um Teste Unitário
-**Comando:** `(cat substitui UnitTest1.cs)`
-- Testa se `HomeController.Index` retorna `ViewResult`.
+- **Scripts Bash para Manutenção:**
+  - Use `monitor-app.sh` para verificar status:
+    ```bash
+    #!/bin/bash
+    set -e
+    az webapp show --name legacylmg-app --resource-group legacylmg-rg --query "state" -o tsv | grep -q "Running" || { echo "Site não está rodando"; exit 1; }
+    echo "Site legacylmg-app está rodando."
+    ```
+  - Teste com:
+    ```bash
+    chmod +x ~/legacy/MeuProjeto/monitor-app.sh
+    ~/legacy/MeuProjeto/monitor-app.sh
+    ```
 
-### Passo 4: Executar os Testes
-**Comando:** `dotnet test MeuProjeto.Tests`
-- **`test MeuProjeto.Tests`**: Executa o teste unitário no projeto especificado.
+- **Atualizações e Segurança:**
+  - Atualize o self-hosted runner:
+    ```bash
+    cd ~/legacy/actions-runner
+    ./config.sh remove
+    curl -o actions-runner-linux-x64-2.308.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.308.0/actions-runner-linux-x64-2.308.0.tar.gz
+    tar xzf ./actions-runner-linux-x64-2.308.0.tar.gz
+    ./config.sh --url https://github.com/lucasmgpy/legacy --token <RUNNER_TOKEN>
+    ./run.sh
+    ```
+  - Verifique segredos no GitHub:
+    ```bash
+    gh secret list --repo lucasmgpy/legacy
+    ```
 
-### Passo 5: Adicionar ao Git
-**Comandos:**
-1. `git add .`
-2. `git commit -m "Adicionado teste unitário"`
-3. `git push origin main`
+#### Contribuições e Próximos Passos
+- Este documento substitui o README.md para fornecer uma documentação completa e estruturada.
+- Para contribuir, faça forks no GitHub, crie branches (`git checkout -b feature/nova-funcionalidade`), e envie pull requests.
+- Próximos passos: Explorar monitoramento avançado com Prometheus/Grafana, segurança em CI/CD, ou integração com Kubernetes para escalabilidade.
 
-### Nota de Revisão
-- Testes de integração foram removidos por simplicidade, mantendo apenas o teste unitário.
-- Arquivos `IntegrationTest1.cs` e `TestStartup.cs` excluídos, pacote `Microsoft.AspNetCore.Mvc.Testing` removido.
+---
 
-## Fase 5: Criar Scripts Bash
-
-### Passo 1: Criar o Script `build.sh`
-**Comando:** `(cat cria build.sh)`
-- Compila o projeto com `dotnet build`.
-
-### Passo 2: Criar o Script `test.sh`
-**Comando:** `(cat cria test.sh)`
-- Executa testes unitários com `dotnet test` (testes de integração removidos por erros).
-
-### Passo 3: Criar o Script `deploy.sh`
-**Comando:** `(cat cria deploy.sh)`
-- Simula deploy com `dotnet publish`.
-
-### Passo 4: Tornar os Scripts Executáveis
-**Comando:** `chmod +x *.sh`
-- **`chmod +x`**: Dá permissão de execução.
-- **`*.sh`**: Aplica a todos os scripts `.sh`.
-
-### Passo 5: Adicionar ao Git
-**Comandos:**
-1. `git add .`
-2. `git commit -m "Adicionados scripts bash para build, test e deploy"`
-3. `git push origin main`
-
-## Fase 6: Configurar Terraform para Infraestrutura no Azure
-
-### Passo 1: Criar uma Pasta para o Terraform
-**Comando:** `mkdir infra`
-- Cria a pasta `infra` para arquivos Terraform.
-
-### Passo 2: Criar o Arquivo `main.tf`
-**Comando:** `(cat cria main.tf)`
-- Define um Resource Group, App Service Plan e App Service no Azure.
-
-### Passo 3: Autenticar no Azure
-**Comando:** `az login`
-- Autentica no Azure via navegador.
-
-### Passo 4: Inicializar o Terraform
-**Comando:** `terraform init`
-- Baixa provedores e inicializa o Terraform.
-
-### Passo 5: Aplicar a Infraestrutura
-**Comando:** `terraform apply`
-- Cria os recursos no Azure (digite `yes` para confirmar).
-
-### Passo 6: Adicionar ao Git
-**Comandos:**
-1. `cd ..`
-2. `echo "infra/terraform.tfstate" >> .gitignore`
-   - Ignora o arquivo de estado.
-3. `git add .`
-4. `git commit -m "Adicionada infra Terraform para Azure"`
-5. `git push origin main`
-### Nota: Correção Final de Arquivos Grandes na Fase 6
-- **Problema:** Arquivo `infra/.terraform/.../terraform-provider-azurerm_v3.117.1_x5` (222.83 MB) no commit `abf5e8d`.
-- **Solução:**
-  1. Durante `git rebase -i` em `abf5e8d` (HEAD `66eb5a6`):
-     - Adicionada linha em branco em `infra/main.tf` para rastreamento.
-     - `git rm -r --cached infra/.terraform`
-     - `git add infra/main.tf`
-     - `git commit --amend`
-  2. `git rebase --continue`
-  3. Pós-rebase:
-     - `git reset --soft HEAD^`
-     - `git rm -r --cached infra/.terraform.lock.hcl`
-     - `git commit -m "Adiciona infra Terraform para Azure (sem .terraform nem .lock)"`
-  4. `git push origin main --force`
-  5. `cd infra && terraform init`
-- **Nota:** `infra/.terraform.lock.hcl` permanece em `66eb5a6`, mas é removido em `714561f`. Limpeza adicional pode ser feita posteriormente.
-
-## Fase 7: Configurar Pipeline Jenkins CI/CD com Docker na Pipeline
-- **Objetivo:** Criar uma pipeline Jenkins que compile, teste e faça deploy do projeto MVC no Azure, rodando em contêineres Docker para ambiente isolado.
-- **Passos:**
-  1. Configurado Jenkins para usar Docker:
-     - Plugin "Docker Pipeline" instalado via interface em http://localhost:8080.
-     - Permissões ajustadas: `sudo usermod -aG docker jenkins && sudo systemctl restart jenkins`.
-  2. Criado `Jenkinsfile` com pipeline em contêiner .NET SDK 8.0:
-     - Estágios: "Build", "Test", "Setup Environment" (instala Azure CLI e zip), "Deploy to Azure".
-     - Credenciais Azure vinculadas com `environment` e `credentials()`.
-     - Deploy via ZIP com `az webapp deployment source config-zip`.
-  3. Configuradas credenciais Azure no Jenkins:
-     - Adicionados `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` em "Manage Credentials".
-  4. Pipeline criada em http://localhost:8080:
-     - Tipo: "Pipeline script from SCM".
-     - URL: `git@github.com:lucasmgpy/legacy.git`.
-     - Script Path: `Jenkinsfile`.
-  5. Arquivos adicionados ao Git:
-     - `git add Jenkinsfile`
-     - `git commit -m "Adicionada pipeline Jenkins com Docker para ambiente isolado"`
-     - `git push origin main`
-     
-## Fase 8: Migrar para GitHub Actions com Self-Hosted Runner
-- **Objetivo:** Migrar a pipeline CI/CD do Jenkins para GitHub Actions, utilizando um self-hosted runner configurado na máquina Ubuntu 22.04, para replicar o ambiente do projeto legado.
-- **Passos:**
-  1. **Configurado self-hosted runner no Ubuntu 22.04:**
-     - Criado diretório para o runner: `mkdir actions-runner && cd actions-runner`.
-     - Baixado o pacote do runner: `curl -o actions-runner-linux-x64-2.317.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz`.
-     - Extraiu o pacote: `tar xzf actions-runner-linux-x64-2.317.0.tar.gz`.
-     - Configurado o runner no GitHub: `./config.sh --url https://github.com/lucasmgpy/legacy --token <TOKEN>`, usando um token gerado em Settings > Actions > Runners no GitHub.
-     - Testado o runner: `./run.sh` e configurado como serviço para execução contínua: `sudo ./svc.sh install && sudo ./svc.sh start`.
-  2. **Criado workflow YAML para GitHub Actions:**
-     - Criado arquivo `.github/workflows/ci-cd.yml` com:
-       - `name: CI-CD Pipeline`: Nome do workflow.
-       - `on: push: branches: [ main ]`: Dispara no push para `main`.
-       - `jobs: build-test-deploy: runs-on: self-hosted`: Job único rodando no self-hosted runner.
-       - `steps:` com checkout (`actions/checkout@v3`), build (`./build.sh`), test (`./test.sh`), instalação da Azure CLI e zip, e deploy no Azure:
-         - `sudo apt-get update && sudo apt-get install -y curl zip && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`.
-         - `az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID`.
-         - `cd MeuProjeto && dotnet publish -c Release -o publish && zip -r publish.zip publish && az webapp deployment source config-zip --resource-group legacy-rg --name legacy-app --src publish.zip`.
-  3. **Configurados segredos no GitHub:**
-     - Adicionados `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, e `AZURE_TENANT_ID` em Settings > Secrets and variables > Actions > Secrets, usando valores obtidos do Azure (via `az ad sp create-for-rbac`).
-  4. **Adicionado ao Git:**
-     - `git add .github/workflows/ci-cd.yml`
-     - `git commit -m "Migrada pipeline para GitHub Actions com self-hosted runner"`
-     - `git push origin main`
-- **Resultados:** A pipeline CI/CD foi migrada com sucesso, executando build, test e deploy no Azure via GitHub Actions em um self-hosted runner, replicando a funcionalidade do Jenkins e atendendo aos requisitos do projeto legado.
+### Key Citations
+- [Azure CLI Documentation for App Service Logging](https://learn.microsoft.com/en-us/cli/azure/webapp/log?view=azure-cli-latest)
+- [GitHub Actions Runner Documentation](https://docs.github.com/en/actions/hosting-your-own-runners)
+- [Docker Hub Official Documentation](https://docs.docker.com/docker-hub/)
+- [Azure Monitor Metrics CLI Reference](https://learn.microsoft.com/en-us/cli/azure/monitor/metrics?view=azure-cli-latest)
+- [Terraform Azure Provider Documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
